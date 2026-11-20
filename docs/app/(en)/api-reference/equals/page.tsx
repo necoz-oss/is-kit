@@ -62,6 +62,13 @@ export default function EqualsPage() {
             and broad keys remain runtime checks with object-only narrowing.
           </Paragraph>
         </Stack>
+        <Paragraph>
+          For <code>equalsKey</code>, the guard checks that the input is a
+          non-null object with an <strong>own property</strong> (not inherited)
+          matching the key, using <code>Object.is</code> semantics for value
+          comparison. A missing key never matches, even when the target is{' '}
+          <code>undefined</code>.
+        </Paragraph>
         <CodeBlock language='ts' code={sampleEqualsByAndKey} />
       </Stack>
       <ApiReferencePager currentHref={API_REFERENCE_PATHS.equals} />

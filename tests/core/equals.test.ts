@@ -70,6 +70,13 @@ describe('equalsKey', () => {
     expect(isUser(nil)).toBe(true);
   });
 
+  it('does not match missing keys even when target is undefined', () => {
+    const isKindUndefined = equalsKey('kind', undefined);
+
+    expect(isKindUndefined({})).toBe(false);
+    expect(isKindUndefined({ kind: undefined })).toBe(true);
+  });
+
   it('compares only the runtime-selected key from a union', () => {
     const createSelectedKeyComparator = (key: 'kind' | 'id') =>
       equalsKey(key, 'user');

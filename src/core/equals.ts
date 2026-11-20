@@ -66,7 +66,12 @@ export function equalsBy<F extends Predicate<unknown>, K>(
 }
 
 /**
- * Creates a guard that matches objects having a key equal to the target value.
+ * Creates a guard that matches objects having an own property equal to the target
+ * value, using `Object.is` for value comparison.
+ *
+ * The guard checks that the input is a non-null object with an own property
+ * matching the key. Inherited properties do not match; a missing key never
+ * matches, even when `target` is `undefined`.
  *
  * @param key Property key to compare; singleton literals narrow that property.
  * @param target Value to compare using `Object.is`.
