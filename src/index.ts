@@ -15,6 +15,7 @@ export { and, andAll, guardIn, not, or } from './core/logic';
 export { nullable, nonNull, nullish, optional, required } from './core/nullish';
 export { safeJsonParse, safeParse, safeParseWith } from './core/parse';
 export { predicateToRefine } from './core/predicate';
+export { toStandardSchema } from './core/standard-schema';
 
 // Primitive guards
 export {
