@@ -1,5 +1,5 @@
 import { expectAssignable, expectType } from 'tsd';
-import { isString, toStandardSchema } from '@/index';
+import { isString, toStandardSchema } from 'is-kit';
 
 // =============================================
 // describe: toStandardSchema
@@ -11,6 +11,12 @@ expectType<string>({} as Types['input']);
 expectType<string>({} as Types['output']);
 schema['~standard'].validate('value', { libraryOptions: {} });
 
+// it: returns a synchronous success or failure result
+type ValidationResult =
+  | { readonly value: string; readonly issues?: undefined }
+  | { readonly issues: ReadonlyArray<{ readonly message: string }> };
+expectType<ValidationResult>(schema['~standard'].validate('value'));
+
 // it: is structurally compatible with the Standard Schema v1 contract
 type StandardSchemaV1<Input, Output> = {
   readonly '~standard': {
@@ -18,7 +24,9 @@ type StandardSchemaV1<Input, Output> = {
     readonly vendor: string;
     readonly validate: (
       value: unknown,
-      options?: { readonly libraryOptions?: Record<string, unknown> }
+      options?:
+        | { readonly libraryOptions?: Record<string, unknown> | undefined }
+        | undefined
     ) =>
       | { readonly value: Output; readonly issues?: undefined }
       | { readonly issues: ReadonlyArray<{ readonly message: string }> }

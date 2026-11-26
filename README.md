@@ -606,9 +606,10 @@ const form = useForm({
 });
 ```
 
-The adapter validates synchronously, preserves accepted values, and reports a
-generic `Invalid value` issue without a field path. The original guard remains
-available for ordinary narrowing and composition.
+The adapter validates synchronously and preserves accepted values. A guard that
+returns `false` produces a generic `Invalid value` issue without a field path;
+an exception thrown by the guard propagates unchanged, as with `safeParse`.
+The original guard remains available for ordinary narrowing and composition.
 
 ### 10. Decode and validate JSON input
 

@@ -2,7 +2,14 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "is-kit": ["dist/index.d.ts"]
+    }
   },
-  "include": ["./core/property-refinement-strict.test-d.ts"]
+  "include": [
+    "./core/property-refinement-strict.test-d.ts",
+    "./core/standard-schema.test-d.ts"
+  ]
 }

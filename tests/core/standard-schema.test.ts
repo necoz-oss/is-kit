@@ -17,4 +17,18 @@ describe('toStandardSchema', () => {
       issues: [{ message: 'Invalid value' }]
     });
   });
+
+  it('propagates exceptions from the guard unchanged', () => {
+    const error = new Error('guard failed');
+    const schema = toStandardSchema((_value: unknown): _value is string => {
+      throw error;
+    });
+
+    try {
+      schema['~standard'].validate('value');
+      throw new Error('Expected the guard to throw');
+    } catch (caught) {
+      expect(caught).toBe(error);
+    }
+  });
 });
