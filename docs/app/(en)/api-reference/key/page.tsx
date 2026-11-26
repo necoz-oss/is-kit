@@ -54,6 +54,26 @@ if (isGuestOrTrial(input)) {
   // input.role is narrowed to 'guest' | 'trial'
 }`;
 
+const sampleNarrowKeyToBaseGuard = `import { hasKeys, narrowKeyTo } from 'is-kit';
+
+const hasNameAndRole = hasKeys('name', 'role');
+const isAdmin = narrowKeyTo(hasNameAndRole, 'role')('admin');
+
+// The base guard runs first: without an own 'name' key, 'role' is never read.
+isAdmin({ role: 'admin' }); // false
+
+let reads = 0;
+const candidate = {
+  name: 'Ada',
+  get role() {
+    reads += 1;
+    return 'admin';
+  },
+};
+
+isAdmin(candidate); // true — 'role' is read only after hasKeys('name', 'role') passes
+reads; // 1`;
+
 const sampleRefineKey = `import { isString, refineKey } from 'is-kit';
 
 const hasStringValue = refineKey('value', isString);
@@ -138,8 +158,17 @@ export default function KeyPage() {
             values. A union or broad key remains callable as a runtime check but
             preserves only the base guard type.
           </Paragraph>
+          <Paragraph>
+            The base guard runs first and short-circuits: the property is only
+            read — and compared with the requested literal using{' '}
+            <code>Object.is</code> — after the base guard passes. A value the
+            base guard rejects never has the property read, which makes{' '}
+            <code>narrowKeyTo</code> a useful shape gate before touching a
+            property that may be a getter.
+          </Paragraph>
         </Stack>
         <CodeBlock language='ts' code={sampleNarrowKeyTo} />
+        <CodeBlock language='ts' code={sampleNarrowKeyToBaseGuard} />
       </Stack>
       <Stack variant='section' gap='sm'>
         <Stack gap='xs'>
