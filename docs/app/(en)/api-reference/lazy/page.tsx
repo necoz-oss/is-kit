@@ -48,6 +48,12 @@ export default function LazyPage() {
           after successful initialization. If the factory throws, the error is
           propagated and a later evaluation can retry initialization.
         </Paragraph>
+        <Paragraph>
+          Once the factory has succeeded, the cached predicate stays cached
+          even if invoking it later throws: the error propagates to the caller,
+          but the next evaluation reuses the same predicate instead of running
+          the factory again.
+        </Paragraph>
       </Stack>
 
       <Stack variant='section' gap='sm'>
