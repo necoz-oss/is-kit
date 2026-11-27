@@ -84,6 +84,7 @@ import {
   setOf,
   struct,
   toBooleanPredicates,
+  toStandardSchema,
   tupleOf,
   typedStruct
 } from 'is-kit';
@@ -201,6 +202,7 @@ const publicRuntimeContract = {
   setOf,
   struct,
   toBooleanPredicates,
+  toStandardSchema,
   tupleOf,
   typedStruct
 };

@@ -5,12 +5,14 @@ import {
   hasKey,
   hasKeys,
   isDataView,
+  isString,
   isTypedArray,
   narrowKeyTo,
   oneOf,
   refineDefinedKey,
   refineIndex,
-  refineKey
+  refineKey,
+  toStandardSchema
 } from 'is-kit';
 
 // =============================================
@@ -18,6 +20,18 @@ import {
 // =============================================
 // Note: This fixture compiles against the packed package and the selected
 // TypeScript version, not against source aliases or the workspace compiler.
+
+// it: exposes a synchronous Standard Schema with matching input and output
+const stringSchema = toStandardSchema(isString);
+type SchemaTypes = NonNullable<(typeof stringSchema)['~standard']['types']>;
+const schemaInput: SchemaTypes['input'] = 'value';
+const schemaOutput: SchemaTypes['output'] = schemaInput;
+const schemaResult:
+  | { readonly value: string; readonly issues?: undefined }
+  | {
+      readonly issues: ReadonlyArray<{ readonly message: string }>;
+    } = stringSchema['~standard'].validate(schemaOutput);
+void schemaResult;
 
 // it: preserves built-in view narrowing across TypeScript library versions
 declare const candidateView: unknown;

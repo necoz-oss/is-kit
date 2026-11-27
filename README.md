@@ -589,6 +589,28 @@ assert(isString, input, 'Expected a string');
 input.toUpperCase();
 ```
 
+### Standard Schema interoperability
+
+Use `toStandardSchema` to pass an existing guard to a Standard Schema consumer,
+such as [TanStack Form](https://tanstack.com/form/latest/docs/framework/react/guides/validation):
+
+```ts
+import { useForm } from '@tanstack/react-form';
+import { isString, struct, toStandardSchema } from 'is-kit';
+
+const userSchema = toStandardSchema(struct({ name: isString }));
+const form = useForm({
+  defaultValues: { name: '' },
+  validators: { onChange: userSchema },
+  onSubmit: async ({ value }) => console.log(value)
+});
+```
+
+The adapter validates synchronously and preserves accepted values. A guard that
+returns `false` produces a generic `Invalid value` issue without a field path;
+an exception thrown by the guard propagates unchanged, as with `safeParse`.
+The original guard remains available for ordinary narrowing and composition.
+
 ### 10. Decode and validate JSON input
 
 Use `safeJsonParse` at a JSON text boundary. It decodes the text, treats the
