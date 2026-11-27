@@ -94,6 +94,16 @@ const API_CATALOG = [
       'Validate unknown values and decoded JSON with TypeScript type guards using safeParse, safeParseWith, and safeJsonParse.'
   },
   {
+    id: 'standardSchema',
+    href: '/api-reference/standard-schema',
+    section: 'core',
+    label: 'toStandardSchema',
+    summary: 'Adapt a guard for Standard Schema consumers.',
+    seoTitle: 'toStandardSchema — Standard Schema Interoperability | is-kit',
+    seoDescription:
+      'Use is-kit TypeScript guards with Standard Schema consumers, including TanStack Form, while preserving inferred types.'
+  },
+  {
     id: 'assert',
     href: '/api-reference/assert',
     section: 'core',
