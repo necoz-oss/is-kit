@@ -72,6 +72,27 @@ validCircle(shapeCircleValid); // true
 validCircle(shapeCircleNegativeRadius); // false (radius not positive)
 validCircle(shapeRect); // false (not a circle)`;
 
+const sampleOr = `import { or, define, isString, isNumber } from 'is-kit';
+
+// Predicates are evaluated in the order supplied, and evaluation stops
+// after the first predicate that passes — later predicates are never run.
+const isId = or(isString, isNumber);
+isId('user-1'); // true — isNumber is never called
+isId(123); // true — isString runs first and fails, then isNumber passes
+
+// When no predicate matches, every predicate is evaluated exactly once.
+isId(true); // false — isString and isNumber both run
+
+// An error thrown by an invoked predicate propagates unchanged, and
+// later predicates are not evaluated.
+const throwing = define<unknown>(() => {
+  throw new Error('guard failed');
+});
+or(throwing, isString)('value'); // throws Error('guard failed')
+
+// or() with no predicates rejects every value.
+or()('value'); // false`;
+
 export default function LogicPage() {
   return (
     <Stack variant='main' className='container mx-auto px-4 py-10' gap='xl'>
@@ -84,6 +105,19 @@ export default function LogicPage() {
           </Paragraph>
         </Stack>
         <CodeBlock code={sample} language='ts' />
+      </Stack>
+      <Stack variant='section' gap='md'>
+        <Stack gap='xs'>
+          <Heading variant='h2'>or</Heading>
+          <Paragraph>
+            Predicates are evaluated in the order supplied, and evaluation stops
+            after the first predicate that passes — later predicates are never
+            run. When no predicate matches, every predicate is evaluated exactly
+            once. An error thrown by an invoked predicate propagates unchanged,
+            and <code>or()</code> with no predicates rejects every value.
+          </Paragraph>
+        </Stack>
+        <CodeBlock language='ts' code={sampleOr} />
       </Stack>
       <Stack variant='section' gap='md'>
         <Stack gap='xs'>
