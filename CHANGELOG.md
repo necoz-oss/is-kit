@@ -6,6 +6,175 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/) and [Sem
 
 ---
 
+## [v1.17.0] - 2026-11-27
+
+### Added
+
+- add Standard Schema adapter by @nyaomaru in [#485](https://github.com/necoz-oss/is-kit/pull/485)
+  - Why: Adding Standard Schema interoperability would let existing is-kit guards integrate with a wider ecosystem without turning is-kit into a schema-first library.
+
+### Docs
+
+- 1.16.6 by @github-actions[bot] in [#463](https://github.com/necoz-oss/is-kit/pull/463)
+- note narrowKeyTo base-guard short-circuit behavior (#475) by @daocuong11 in [#476](https://github.com/necoz-oss/is-kit/pull/476)
+- document sparse-array and short-circuit behavior (#464) by @daocuong11 in [#477](https://github.com/necoz-oss/is-kit/pull/477)
+- document iteration order and short-circuit behavior (#466) by @daocuong11 in [#478](https://github.com/necoz-oss/is-kit/pull/478)
+- document boolean coercion semantics (#473) by @daocuong11 in [#480](https://github.com/necoz-oss/is-kit/pull/480)
+- clarify caching after predicate invocation errors by @daocuong11 in [#482](https://github.com/necoz-oss/is-kit/pull/482)
+- document wrapper short-circuit behavior by @daocuong11 in [#483](https://github.com/necoz-oss/is-kit/pull/483)
+- document or evaluation order and short-circuit behavior (#467) by @daocuong11 in [#479](https://github.com/necoz-oss/is-kit/pull/479)
+- document key/value evaluation and short-circuit behavior by @daocuong11 in [#484](https://github.com/necoz-oss/is-kit/pull/484)
+
+### Test
+
+- cover equalsKey missing-key behavior with undefined target by @Lil-Clanky in [#458](https://github.com/necoz-oss/is-kit/pull/458)
+
+### Chore
+
+- Release: 1.17.0 by @github-actions[bot] in [#486](https://github.com/necoz-oss/is-kit/pull/486)
+
+### 🔥 Introducing `toStandardSchema`
+
+[[Standard Schema](https://standardschema.dev/schema)](https://standardschema.dev/schema) is a common interface designed to make TypeScript validation libraries interoperable.
+
+Instead of requiring ecosystem tools to support every validation library individually, Standard Schema provides a shared validation contract.
+
+Starting with v1.17.0, you can turn any existing is-kit guard into a Standard Schema-compatible validator.
+
+#### Getting started
+
+```ts
+import { isString, toStandardSchema } from 'is-kit';
+
+const schema = toStandardSchema(isString);
+
+schema['~standard'].validate('hello');
+// { value: 'hello' }
+
+schema['~standard'].validate(42);
+// { issues: [{ message: 'Invalid value' }] }
+```
+
+Input and output types are preserved, too!
+
+```ts
+type SchemaTypes = NonNullable<
+  typeof schema['~standard']['types']
+>;
+
+type Input = SchemaTypes['input'];   // string
+type Output = SchemaTypes['output']; // string
+```
+
+#### Small implementation, wider possibilities
+
+The adapter itself is intentionally simple.
+
+```ts
+export function toStandardSchema<T>(
+  guard: Guard<T>
+): GuardSchema<T> {
+  return {
+    '~standard': {
+      version: 1,
+      vendor: 'is-kit',
+      validate: (value) =>
+        guard(value)
+          ? { value }
+          : { issues: [{ message: 'Invalid value' }] }
+    }
+  };
+}
+```
+
+- Zero additional dependencies.
+- Synchronous validation.
+- Original values are preserved.
+- Input and output types are inferred.
+- Exceptions thrown by guards propagate unchanged.
+- Validation failures return a generic issue without a field path.
+
+No new schema system. No transformation pipeline. Just a small bridge between existing is-kit guards and the Standard Schema ecosystem. 🐈
+
+#### Example: TanStack Form
+
+You can now use existing is-kit guards with tools such as TanStack Form.
+
+```ts
+import { useForm } from '@tanstack/react-form';
+import {
+  isString,
+  struct,
+  toStandardSchema
+} from 'is-kit';
+
+const isUser = struct({
+  name: isString
+});
+
+const userSchema = toStandardSchema(isUser);
+
+function useUserForm() {
+  return useForm({
+    defaultValues: {
+      name: ''
+    },
+    validators: {
+      onChange: userSchema
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    }
+  });
+}
+```
+
+And your original guard remains available for ordinary TypeScript narrowing, filtering, and composition.
+
+```ts
+if (isUser(input)) {
+  input.name; // string
+}
+
+const validUsers = users.filter(isUser);
+```
+
+Use guards where guards make sense, and Standard Schema where interoperability matters.
+
+#### Learn more
+
+- [[is-kit: toStandardSchema API Reference](https://is-kit.dev/api-reference/standard-schema)](https://is-kit.dev/api-reference/standard-schema)
+- [[Standard Schema specification](https://standardschema.dev/schema)](https://standardschema.dev/schema)
+- [[TanStack Form: Validation](https://tanstack.com/form/latest/docs/framework/react/guides/validation)](https://tanstack.com/form/latest/docs/framework/react/guides/validation)
+- Implementation: https://github.com/necoz-oss/is-kit/pull/485
+
+### Thank You, Contributors! 🎉
+
+It's always exciting to see contributors return and continue improving is-kit.
+
+- **@daocuong11** contributed an incredible 8 documentation improvements in this release! 🙌
+
+  - `narrowKeyTo` base-guard short-circuit behavior: https://github.com/necoz-oss/is-kit/pull/476
+  - `arrayOf` sparse-array and short-circuit behavior: https://github.com/necoz-oss/is-kit/pull/477
+  - `setOf` iteration order and short-circuit behavior: https://github.com/necoz-oss/is-kit/pull/478
+  - `or` evaluation order and error propagation: https://github.com/necoz-oss/is-kit/pull/479
+  - `define` boolean coercion semantics: https://github.com/necoz-oss/is-kit/pull/480
+  - `lazy` caching after predicate invocation errors: https://github.com/necoz-oss/is-kit/pull/482
+  - Nullish wrapper short-circuit behavior: https://github.com/necoz-oss/is-kit/pull/483
+  - `mapOf` key/value evaluation order: https://github.com/necoz-oss/is-kit/pull/484
+
+  Thank you for making so many of our small runtime guarantees easier to discover and understand! 😸💚
+
+- **@Lil-Clanky** returned with additional regression coverage and documentation for `equalsKey`, clarifying missing-key behavior, own-property checks, and support for null-prototype objects.
+
+  https://github.com/necoz-oss/is-kit/pull/458
+
+  Thank you for continuing to help make is-kit more predictable and reliable! 🐈🙌
+
+**Full Changelog**: https://github.com/necoz-oss/is-kit/compare/v1.16.6...v1.17.0
+
+[v1.17.0]: https://github.com/necoz-oss/is-kit/compare/v1.16.6...v1.17.0
+
 ## [v1.16.6] - 2026-11-21
 
 ### Fixed
@@ -2416,7 +2585,7 @@ if (isGuestOrTrial(input)) {
 - Merge pull request #39 from nyaomaru/chore/update-CHANGELOG (#39)
 - update CHANGELOG (#39)
 
-[Unreleased]: https://github.com/necoz-oss/is-kit/compare/v1.16.6...HEAD
+[Unreleased]: https://github.com/necoz-oss/is-kit/compare/v1.17.0...HEAD
 [v1.0.5]: https://github.com/necoz-oss/is-kit/compare/v1.0.4...v1.0.5
 
 ## [1.0.4] - 2025-10-25
